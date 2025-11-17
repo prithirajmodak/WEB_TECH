@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Two-Article Comment System</title>
+    <style>
+        :root {
+            --max-width: 800px;
+            --primary: #1a1a1a;
+            --muted: #555;
+            --bg: #f4f4f4;
+            --danger: #d9534f;
+            --success: #2e8b57;
+            --card: #ffffff;
+            --comment-bg: #f9f9f9;
+            --section-bg: #eeeeee;
+            --btn-primary: #222;
+
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Georgia, "Times New Roman", serif;
+            background: var(--bg);
+            color: #222;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 24px;
+        }
+
+
+        .article {
+            background: #fff;
+            padding: 30px 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            margin-bottom: 25px;
+            border-left: 4px solid var(--primary);
+        }
+
+        h1 {
+            margin: 0 0 16px 0;
+            font-size: 40px;
+            color: var(--primary);
+            font-weight: bold;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 6px;
+        }
+
+        .lead {
+            color: var(--muted);
+            font-size: 16px;
+            text-align: justify;
+            line-height: 1.8;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid #ccc;
+            margin: 18px 0;
+        }
+
+        .comment-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+            background: var(--section-bg);
+            padding: 10px 12px;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+
+        .stats {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .stat strong {
+            color: var(--primary);
+        }
+
+        .comment-form {
+            background: var(--comment-bg);
+            border: 1px solid #ddd;
+            padding: 18px;
+            border-radius: 6px;
+            margin-bottom: 18px;
+        }
+
+        .form-row {
+            margin-bottom: 12px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-row label {
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 15px;
+        }
+
+        .form-row input[type="text"],
+        .form-row input[type="email"],
+        .form-row textarea {
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 15px;
+            background: #fff;
+            width: 100%;
+        }
+
+        .form-row textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .req {
+            color: var(--danger);
+            font-weight: 700;
+            margin-left: 6px;
+        }
+
+        .error {
+            color: var(--danger);
+            font-size: 13px;
+            margin-top: 6px;
+            min-height: 18px;
+        }
+
+        .stars {
+            display: inline-flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .stars span {
+            font-size: 28px;
+            cursor: pointer;
+            color: #ccc;
+            transition: color 0.12s ease;
+            user-select: none;
+        }
+
+        .stars span:hover,
+        .stars span:hover~span {
+            color: #f0a500;
+        }
+
+        .selected-rating {
+            font-size: 14px;
+            color: var(--muted);
+            margin-top: 6px;
+        }
+
+        .btn {
+            padding: 8px 14px;
+            border-radius: 6px;
+            border: 1px solid #bbb;
+            background: #fff;
+            cursor: pointer;
+        }
+
+        .btn.primary {
+            background: var(--btn-primary);
+            color: white;
+            border-color: var(--btn-primary);
+        }
+
+        .btn.primary:hover {
+            background: #444;
+            border-color: #444;
+            color: #fff;
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
+
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .comments-list {
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .comment-card {
+            padding: 14px;
+            border-radius: 6px;
+            background: #fff;
+            border: 1px solid #ddd;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .comment-meta {
+            display: flex;
+            justify-content: space-between;
+            color: var(--muted);
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+
+        .comment-body {
+            white-space: pre-wrap;
+            font-size: 15px;
+            color: #222;
+        }
+
+        .comment-rating {
+            color: #f0a500;
+            font-weight: 700;
+            margin-left: 6px;
+        }
+
+        @media (max-width: 560px) {
+            .comment-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .stats {
+                gap: 8px;
+            }
+        }
+    </style>
+
+
+</head>
+
+<body>
+
+    <main class="container">
+
+        <!-- 1 -->
+        <article class="article">
+            <h1>The Growing Popularity and Future Impact of Electric Vehicles</h1>
+            <p class="lead">Electric vehicles (EVs) are becoming increasingly popular as people look for cleaner and
+                more efficient transportation options.Unlike petrol or diesel cars, EVs run entirely on electricity,
+                which reduces emissions and helps protect
+                the environment.They are also cheaper to operate because they require less maintenance and cost less to
+                recharge than traditional fuel. However, EVs still face challenges such as limited charging stations and
+                long charging
+                times. Despite these issues, advancements in battery technology and expanding charging networks are
+                making EVs more practical every year, ensuring that they will play a major role in future
+                transportation.</p>
+            <hr>
+
+            <section class="comment-header">
+                <h2>Comments</h2>
+                <div class="stats">
+                    <div id="totalComments1">Total comments: <strong>0</strong></div>
+                    <div id="avgRating1">Average rating: <strong>N/A</strong></div>
+                </div>
+            </section>
+
+            <form id="commentForm1" class="comment-form" novalidate>
+                <div class="form-row">
+                    <label for="name1">Name <span class="req">*</span></label>
+                    <input id="name1" type="text" placeholder="Your name (2-50 chars)">
+                    <div class="error" id="errName1"></div>
+                </div>
+
+                <div class="form-row">
+                    <label for="email1">Email (optional)</label>
+                    <input id="email1" type="email" placeholder="name@example.com">
+                    <div class="error" id="errEmail1"></div>
+                </div>
+
+                <div class="form-row">
+                    <label for="comment1">Comment <span class="req">*</span></label>
+                    <textarea id="comment1" rows="4" placeholder="Write your comment (10-500 chars)"></textarea>
+                    <div class="error" id="errComment1"></div>
+                </div>
+
+                <div class="form-row">
+                    <label>Rating (optional)</label>
+                    <div class="stars" id="stars1">
+                        <span data-value="1">★</span>
+                        <span data-value="2">★</span>
+                        <span data-value="3">★</span>
+                        <span data-value="4">★</span>
+                        <span data-value="5">★</span>
+                    </div>
+                    <p>Selected rating: <span id="selectedRating1">None</span></p>
+                </div>
+
+                <button type="submit" class="btn primary">Submit Comment</button>
+                <button type="button" id="resetBtn1" class="btn">Reset</button>
+            </form>
+
+            <section id="commentsList1" class="comments-list"></section>
+        </article>
+
+        <hr>
+
+        <!-- 2 -->
+        <article class="article">
+            <h1>How Artificial Intelligence Is Shaping Everyday Life</h1>
+            <p class="lead">Artificial Intelligence (AI) is becoming a major part of everyday life, improving the way we
+                work, communicate, and solve problems. From virtual assistants and smart home devices to advanced
+                medical tools, AI helps make tasks faster, smarter, and more personalized. In the future, AI will play a
+                larger role in fields such as healthcare, transportation, and education—for example, by detecting
+                diseases earlier, enabling self-driving cars, or adapting lessons to individual students. Although
+                concerns exist about privacy, job loss, and data security, responsible use of AI can greatly benefit
+                society, making daily life more efficient and convenient.</p>
+            <hr>
+
+            <section class="comment-header">
+                <h2>Comments</h2>
+                <div class="stats">
+                    <div id="totalComments2">Total comments: <strong>0</strong></div>
+                    <div id="avgRating2">Average rating: <strong>N/A</strong></div>
+                </div>
+            </section>
+
+            <form id="commentForm2" class="comment-form" novalidate>
+                <div class="form-row">
+                    <label for="name2">Name <span class="req">*</span></label>
+                    <input id="name2" type="text" placeholder="Your name (2-50 chars)">
+                    <div class="error" id="errName2"></div>
+                </div>
+
+                <div class="form-row">
+                    <label for="email2">Email (optional)</label>
+                    <input id="email2" type="email" placeholder="name@example.com">
+                    <div class="error" id="errEmail2"></div>
+                </div>
+
+                <div class="form-row">
+                    <label for="comment2">Comment <span class="req">*</span></label>
+                    <textarea id="comment2" rows="4" placeholder="Write your comment (10-500 chars)"></textarea>
+                    <div class="error" id="errComment2"></div>
+                </div>
+
+                <div class="form-row">
+                    <label>Rating (optional)</label>
+                    <div class="stars" id="stars2">
+                        <span data-value="1">★</span>
+                        <span data-value="2">★</span>
+                        <span data-value="3">★</span>
+                        <span data-value="4">★</span>
+                        <span data-value="5">★</span>
+                    </div>
+                    <p>Selected rating: <span id="selectedRating2">None</span></p>
+                </div>
+
+                <button type="submit" class="btn primary">Submit Comment</button>
+                <button type="button" id="resetBtn2" class="btn">Reset</button>
+            </form>
+
+            <section id="commentsList2" class="comments-list"></section>
+        </article>
+
+    </main>
+
+    <script>
+        function setupArticle(id) {
+            const comments = [];
+            let selectedRating = null;
+
+            const form = document.getElementById('commentForm' + id);
+            const nameInput = document.getElementById('name' + id);
+            const emailInput = document.getElementById('email' + id);
+            const commentInput = document.getElementById('comment' + id);
+            const commentsList = document.getElementById('commentsList' + id);
+
+            const errName = document.getElementById('errName' + id);
+            const errEmail = document.getElementById('errEmail' + id);
+            const errComment = document.getElementById('errComment' + id);
+
+            const totalCommentsStrong = document.querySelector('#totalComments' + id + ' strong');
+            const avgRatingStrong = document.querySelector('#avgRating' + id + ' strong');
+
+            const stars = document.querySelectorAll('#stars' + id + ' span');
+            const selectedRatingText = document.getElementById('selectedRating' + id);
+            const resetBtn = document.getElementById('resetBtn' + id);
+
+            stars.forEach(star => {
+                star.addEventListener('mouseenter', () => highlightStars(id, Number(star.dataset.value)));
+                star.addEventListener('mouseleave', () => highlightStars(id, selectedRating));
+                star.addEventListener('click', () => {
+                    selectedRating = Number(star.dataset.value);
+                    highlightStars(id, selectedRating);
+                    if (selectedRatingText) selectedRatingText.textContent = selectedRating;
+                });
+            });
+
+            function highlightStars(idLocal, val) {
+                const s = document.querySelectorAll('#stars' + idLocal + ' span');
+                s.forEach(x => {
+                    x.style.color = (val && Number(x.dataset.value) <= val) ? "#ffb400" : "#ccc";
+                });
+            }
+
+            function validate() {
+                let ok = true;
+                if (errName) errName.textContent = "";
+                if (errEmail) errEmail.textContent = "";
+                if (errComment) errComment.textContent = "";
+
+                const n = nameInput.value.trim();
+                if (n.length < 2 || n.length > 50) {
+                    if (errName) errName.textContent = "Name should be between 2 and 50 characters";
+                    ok = false;
+                }
+
+                const e = emailInput.value.trim();
+                if (e !== "" && !e.includes("@")) {
+                    if (errEmail) errEmail.textContent = "Please enter a valid email address";
+                    ok = false;
+                }
+
+                const c = commentInput.value.trim();
+                if (c.length < 10 || c.length > 500) {
+                    if (errComment) errComment.textContent = "Comment should between 10 and 500 characters";
+                    ok = false;
+                }
+
+                return ok;
+            }
+
+            function renderComments() {
+                if (!commentsList) return;
+                commentsList.innerHTML = "";
+
+                comments.slice().reverse().forEach(c => {
+                    const div = document.createElement('div');
+                    div.className = 'comment-card';
+
+                    div.innerHTML = `
+            <strong>${c.name}</strong>
+            <small>${c.email ? " • " + c.email : ""}</small><br>
+            ${c.comment}<br>
+            ${c.rating ? `<span class="rating">Rating: ${"★".repeat(c.rating)}</span>` : ""}
+        `;
+
+                    commentsList.appendChild(div);
+                });
+            }
+
+            function renderStats() {
+                if (totalCommentsStrong) totalCommentsStrong.textContent = comments.length;
+                const rated = comments.filter(c => typeof c.rating === 'number' && c.rating >= 1 && c.rating <= 5);
+                if (avgRatingStrong) avgRatingStrong.textContent = rated.length === 0 ? "N/A" : ((rated.reduce((s, c) => s + c.rating, 0) / rated.length).toFixed(2));
+            }
+
+            if (form) {
+                form.addEventListener('submit', e => {
+                    e.preventDefault();
+                    if (!validate()) return;
+
+                    comments.push({
+                        name: nameInput.value.trim(),
+                        email: emailInput.value.trim(),
+                        comment: commentInput.value.trim(),
+                        rating: (typeof selectedRating === 'number' ? selectedRating : null),
+                        time: Date.now()
+                    });
+
+                    renderComments();
+                    renderStats();
+
+                    form.reset();
+                    selectedRating = null;
+                    highlightStars(id, null);
+                    if (selectedRatingText) selectedRatingText.textContent = "None";
+                });
+            }
+
+            if (resetBtn) {
+                resetBtn.addEventListener('click', () => {
+                    if (form) form.reset();
+                    if (errName) errName.textContent = "";
+                    if (errEmail) errEmail.textContent = "";
+                    if (errComment) errComment.textContent = "";
+                    selectedRating = null;
+                    highlightStars(id, null);
+                    if (selectedRatingText) selectedRatingText.textContent = "None";
+                });
+            }
+
+            renderComments();
+            renderStats();
+            return {
+                addComment: c => { comments.push(c); renderComments(); renderStats(); }
+            };
+        }
+
+        const article1 = setupArticle(1);
+        const article2 = setupArticle(2);
+
+    </script>
+</body>
+
+</html>
